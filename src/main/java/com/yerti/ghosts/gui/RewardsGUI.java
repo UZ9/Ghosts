@@ -27,7 +27,7 @@ public class RewardsGUI implements Listener {
         ItemStack[] items = rewards.toArray(new ItemStack[rewards.size()]);
         //rewards
 
-        int rewardCount = items.length < 5 ? items.length : 5;
+        int rewardCount = Math.min(items.length, 3);
 
         for (int i = 0; i < rewardCount; i++) {
             int slot = findRandomSlot(inventory);

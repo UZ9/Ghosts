@@ -34,6 +34,7 @@ public class EventTimer extends BukkitRunnable implements Listener {
     //TODO: Static is a temporary solution to /forcespawn, working on redoing it now
     private static int delay;
     private static int currentTime;
+    private static int ghostLifeTime = 0;
     private static Map<String, Location> locations;
     private static List<Player> attackers;
     static int tier;
@@ -45,12 +46,12 @@ public class EventTimer extends BukkitRunnable implements Listener {
     static LivingEntity eventEntity;
 
     public EventTimer(int delay, Map<String, Location> locations, Plugin plugin) {
-        this.delay = delay;
-        this.currentTime = delay;
-        this.locations = locations;
-        this.attackers = new ArrayList<Player>();
-        this.plugin = plugin;
-        this.utilities = new Utilities();
+        EventTimer.delay = delay;
+        currentTime = delay;
+        EventTimer.locations = locations;
+        attackers = new ArrayList<Player>();
+        EventTimer.plugin = plugin;
+        utilities = new Utilities();
     }
 
 
@@ -77,13 +78,13 @@ public class EventTimer extends BukkitRunnable implements Listener {
         if (eventEntity == null) return;
         if (event.getEntity() != null) {
             if (event.getEntity() == eventEntity) {
-                event.setDamage(event.getDamage() * (1024 / utilities.getMaxHealth(tier)));
+                event.setDamage(event.getDamage() * (1024. / utilities.getMaxHealth(tier)));
                 updateHealthName((LivingEntity) event.getEntity());
 
 
                 if (event.getDamager() != null) {
                     if (event.getDamager() instanceof Player) {
-                        if (!attackers.contains(attackers)) {
+                        if (!attackers.contains(event.getDamager())) {
                             attackers.add((Player) event.getDamager());
                         }
                     }
@@ -96,8 +97,8 @@ public class EventTimer extends BukkitRunnable implements Listener {
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
 
-
         if (eventEntity == null) return;
+        if (event.getEntity() == null) return;
 
         if (event.getEntity().equals(eventEntity)) {
             event.getDrops().clear();
@@ -179,9 +180,29 @@ public class EventTimer extends BukkitRunnable implements Listener {
     @Override
     public void run() {
 
+        if (eventSpawned && ghostLifeTime > 360) {
+            eventEntity.remove();
+            Bukkit.broadcastMessage(utilities.eventDeathMessage(tier));
+
+            for (Player player : attackers) {
+
+                if (player.getOpenInventory() != null) player.closeInventory();
+                Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(Ghosts.class), () -> {
+                    player.openInventory(new RewardsGUI().getInventory(tier));
+                }, 20L);
+
+            }
+
+
+            eventSpawned = false;
+            eventEntity = null;
+            attackers.clear();
+        }
+
 
         if (currentTime <= 0) {
             currentTime = delay;
+            ghostLifeTime = 0;
 
             spawnGhost();
 
@@ -189,7 +210,10 @@ public class EventTimer extends BukkitRunnable implements Listener {
         } else {
 
 
-            if (eventSpawned) return;
+            if (eventSpawned) {
+                ghostLifeTime++;
+                return;
+            }
             if (locations.size() == 0) return;
 
             currentTime--;
@@ -209,6 +233,9 @@ public class EventTimer extends BukkitRunnable implements Listener {
 
     public void clean() {
         if (eventEntity != null) {
+
+            eventEntity.getWorld().loadChunk(eventEntity.getLocation().getChunk());
+
             eventEntity.remove();
         }
     }
