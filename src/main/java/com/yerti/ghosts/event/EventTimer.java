@@ -2,8 +2,6 @@ package com.yerti.ghosts.event;
 
 
 import com.yerti.ghosts.Ghosts;
-import com.yerti.ghosts.config.CommentYamlConfiguration;
-import com.yerti.ghosts.gui.ItemInputInventory;
 import com.yerti.ghosts.gui.RewardsGUI;
 import com.yerti.ghosts.utils.Utilities;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
@@ -19,13 +17,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import javax.rmi.CORBA.Util;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class EventTimer extends BukkitRunnable implements Listener {
@@ -37,13 +34,15 @@ public class EventTimer extends BukkitRunnable implements Listener {
     private static int ghostLifeTime = 0;
     private static Map<String, Location> locations;
     private static List<Player> attackers;
+    private static Location location;
+    private static UUID entityUUID;
     static int tier;
     private static Plugin plugin;
 
     static boolean eventSpawned = false;
 
     static Utilities utilities;
-    static LivingEntity eventEntity;
+    public static LivingEntity eventEntity;
 
     public EventTimer(int delay, Map<String, Location> locations, Plugin plugin) {
         EventTimer.delay = delay;
@@ -77,7 +76,8 @@ public class EventTimer extends BukkitRunnable implements Listener {
     public void onDamage(EntityDamageByEntityEvent event) {
         if (eventEntity == null) return;
         if (event.getEntity() != null) {
-            if (event.getEntity() == eventEntity) {
+            if (event.getEntity().equals(eventEntity)) {
+                Bukkit.broadcastMessage("Updating");
                 event.setDamage(event.getDamage() * (1024. / utilities.getMaxHealth(tier)));
                 updateHealthName((LivingEntity) event.getEntity());
 
@@ -90,6 +90,15 @@ public class EventTimer extends BukkitRunnable implements Listener {
                     }
 
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        for (Entity entity : event.getChunk().getEntities()) {
+            if (entity.getUniqueId().equals(entityUUID)) {
+                event.setCancelled(true);
             }
         }
     }
@@ -139,6 +148,7 @@ public class EventTimer extends BukkitRunnable implements Listener {
             eventSpawned = false;
             attackers.clear();
             eventEntity = null;
+            entityUUID = null;
         } else {
             attackers.clear();
             eventSpawned = false;
@@ -153,11 +163,14 @@ public class EventTimer extends BukkitRunnable implements Listener {
         Location[] locArray = locations.values().toArray(new Location[locations.size()]);
 
         int index = Utilities.getRandomNumberInRange(0, locArray.length - 1);
+        location = locArray[index];
 
         locArray[index].getWorld().loadChunk(locArray[index].getChunk());
 
-        eventEntity = (LivingEntity) locArray[index].getWorld().spawnEntity(locArray[index], utilities.getEntityType());
 
+
+        eventEntity = (LivingEntity) locArray[index].getWorld().spawnEntity(locArray[index], utilities.getEntityType());
+        entityUUID = eventEntity.getUniqueId();
 
 
 
@@ -182,7 +195,6 @@ public class EventTimer extends BukkitRunnable implements Listener {
 
         if (eventSpawned && ghostLifeTime > 360) {
             eventEntity.remove();
-            Bukkit.broadcastMessage(utilities.eventDeathMessage(tier));
 
             for (Player player : attackers) {
 
@@ -207,11 +219,13 @@ public class EventTimer extends BukkitRunnable implements Listener {
             spawnGhost();
 
 
+
         } else {
 
 
             if (eventSpawned) {
                 ghostLifeTime++;
+                //location.getWorld().loadChunk(location.getChunk());
                 return;
             }
             if (locations.size() == 0) return;
@@ -232,10 +246,12 @@ public class EventTimer extends BukkitRunnable implements Listener {
     }
 
     public void clean() {
+        Bukkit.broadcastMessage("Cleaning");
         if (eventEntity != null) {
 
-            eventEntity.getWorld().loadChunk(eventEntity.getLocation().getChunk());
+            if (location == null) return;
 
+            location.getWorld().loadChunk(location.getChunk());
             eventEntity.remove();
         }
     }
