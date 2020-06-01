@@ -77,7 +77,6 @@ public class EventTimer extends BukkitRunnable implements Listener {
         if (eventEntity == null) return;
         if (event.getEntity() != null) {
             if (event.getEntity().equals(eventEntity)) {
-                Bukkit.broadcastMessage("Updating");
                 event.setDamage(event.getDamage() * (1024. / utilities.getMaxHealth(tier)));
                 updateHealthName((LivingEntity) event.getEntity());
 
@@ -246,7 +245,6 @@ public class EventTimer extends BukkitRunnable implements Listener {
     }
 
     public void clean() {
-        Bukkit.broadcastMessage("Cleaning");
         if (eventEntity != null) {
 
             if (location == null) return;
