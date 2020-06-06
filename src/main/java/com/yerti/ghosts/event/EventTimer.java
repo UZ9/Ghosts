@@ -30,7 +30,7 @@ public class EventTimer extends BukkitRunnable implements Listener {
 
     //TODO: Static is a temporary solution to /forcespawn, working on redoing it now
     private static int delay;
-    private static int currentTime;
+    public static int currentTime;
     private static int ghostLifeTime = 0;
     private static Map<String, Location> locations;
     private static List<Player> attackers;
@@ -251,6 +251,7 @@ public class EventTimer extends BukkitRunnable implements Listener {
 
             location.getWorld().loadChunk(location.getChunk());
             eventEntity.remove();
+            eventEntity = null;
         }
     }
 

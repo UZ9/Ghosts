@@ -6,6 +6,7 @@ import com.yerti.ghosts.config.ConfigManager;
 import com.yerti.ghosts.core.commands.CustomCommand;
 import com.yerti.ghosts.core.inventories.InventoryHandler;
 import com.yerti.ghosts.event.EventTimer;
+import com.yerti.ghosts.event.GhostPrevention;
 import com.yerti.ghosts.gui.ItemInputInventory;
 import com.yerti.ghosts.gui.RewardsGUI;
 import com.yerti.ghosts.utils.Utilities;
@@ -61,6 +62,7 @@ public class Ghosts extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new InventoryHandler(), this);
         Bukkit.getPluginManager().registerEvents(new ItemInputInventory(), this);
         Bukkit.getPluginManager().registerEvents(new RewardsGUI(), this);
+        Bukkit.getPluginManager().registerEvents(new GhostPrevention(), this);
 
 
     }
