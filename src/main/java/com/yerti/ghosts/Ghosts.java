@@ -1,9 +1,7 @@
 package com.yerti.ghosts;
 
 import com.yerti.ghosts.commands.CommandGhost;
-import com.yerti.ghosts.config.CommentYamlConfiguration;
 import com.yerti.ghosts.config.ConfigManager;
-import com.yerti.ghosts.core.commands.CustomCommand;
 import com.yerti.ghosts.core.inventories.InventoryHandler;
 import com.yerti.ghosts.event.EventTimer;
 import com.yerti.ghosts.event.GhostPrevention;
@@ -16,12 +14,9 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class Ghosts extends JavaPlugin {
 

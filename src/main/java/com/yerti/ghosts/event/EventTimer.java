@@ -33,7 +33,7 @@ public class EventTimer extends BukkitRunnable implements Listener {
     public static int currentTime;
     private static int ghostLifeTime = 0;
     private static Map<String, Location> locations;
-    private static List<Player> attackers;
+    private static Map<Player, Long> attackers;
     private static Location location;
     private static UUID entityUUID;
     static int tier;
@@ -48,7 +48,7 @@ public class EventTimer extends BukkitRunnable implements Listener {
         EventTimer.delay = delay;
         currentTime = delay;
         EventTimer.locations = locations;
-        attackers = new ArrayList<Player>();
+        attackers = new HashMap<>();
         EventTimer.plugin = plugin;
         utilities = new Utilities();
     }
@@ -83,9 +83,7 @@ public class EventTimer extends BukkitRunnable implements Listener {
 
                 if (event.getDamager() != null) {
                     if (event.getDamager() instanceof Player) {
-                        if (!attackers.contains(event.getDamager())) {
-                            attackers.add((Player) event.getDamager());
-                        }
+                        attackers.put((Player) event.getDamager(), System.currentTimeMillis());
                     }
 
                 }
@@ -112,12 +110,15 @@ public class EventTimer extends BukkitRunnable implements Listener {
             event.getDrops().clear();
             Bukkit.broadcastMessage(utilities.eventDeathMessage(tier));
 
-            for (Player player : attackers) {
+            for (Map.Entry<Player, Long> entry : attackers.entrySet()) {
+                Player player = entry.getKey();
 
-                if (player.getOpenInventory() != null) player.closeInventory();
-                Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(Ghosts.class), () -> {
-                    player.openInventory(new RewardsGUI().getInventory(tier));
-                }, 20L);
+                if (System.currentTimeMillis() - entry.getValue() < 5000) {//5 seconds
+                    if (player.getOpenInventory() != null) player.closeInventory();
+                    Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(Ghosts.class), () -> {
+                        player.openInventory(new RewardsGUI().getInventory(tier));
+                    }, 20L);
+                }
 
             }
 
@@ -195,12 +196,15 @@ public class EventTimer extends BukkitRunnable implements Listener {
         if (eventSpawned && ghostLifeTime > 360) {
             eventEntity.remove();
 
-            for (Player player : attackers) {
+            for (Map.Entry<Player, Long> entry : attackers.entrySet()) {
+                Player player = entry.getKey();
 
-                if (player.getOpenInventory() != null) player.closeInventory();
-                Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(Ghosts.class), () -> {
-                    player.openInventory(new RewardsGUI().getInventory(tier));
-                }, 20L);
+                if (System.currentTimeMillis() - entry.getValue() < 5000) {//5 seconds
+                    if (player.getOpenInventory() != null) player.closeInventory();
+                    Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(Ghosts.class), () -> {
+                        player.openInventory(new RewardsGUI().getInventory(tier));
+                    }, 20L);
+                }
 
             }
 
