@@ -17,6 +17,13 @@
 # What do you want the prefix to be for all messages?
 prefix: '&8[&7Ghosts&8]'
 
+mongo:
+  database-name: "ghosts"
+  host: "localhost"
+  port: 27017
+  username:
+  password: ""
+
 # The prefix can be used in all of the messages below by using [prefix]
 # By default I don't have it in any of the messages, but just add [prefix] wherever you need it to be.
 
@@ -91,6 +98,8 @@ event-mob-spawn: '&8A tier [tier] ghost has spawned at [locationname]!'
 
 #Message for when there are no locations when using /ghost listlocations
 list-no-locations: "&cThere aren't any locations!"
+
+
 
 # _____
 #/ ____|

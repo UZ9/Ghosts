@@ -1,5 +1,9 @@
 package com.yerti.ghosts;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.MongoCredential;
+import com.mongodb.client.MongoDatabase;
 import com.yerti.ghosts.commands.CommandGhost;
 import com.yerti.ghosts.config.ConfigManager;
 import com.yerti.ghosts.core.inventories.InventoryHandler;
@@ -20,12 +24,30 @@ import java.util.Map;
 
 public class Ghosts extends JavaPlugin {
 
-    CommandGhost ghostCommand;
-    ItemInputInventory editorInventory;
-    EventTimer timer;
+    private CommandGhost ghostCommand;
+    private ItemInputInventory editorInventory;
+    private EventTimer timer;
+    //private JedisPool pool;
+    private MongoClient mongo;
+    private MongoDatabase database;
+    //private JedisManager jedisManager;
 
     @Override
     public void onEnable() {
+        this.mongo = new MongoClient(new MongoClientURI("mongodb://127.0.0.1:27017"));
+
+        /*
+        MongoCredential.createCredential(
+                getConfig().getString("mongo.username"),
+                getConfig().getString("mongo.database-name"),
+                getConfig().getString("mongo.password").toCharArray()
+        );*/
+
+        System.out.println("Attempting..");
+        database = mongo.getDatabase(getConfig().getString("mongo.database-name"));
+
+
+
 
         new ConfigManager(this).initConfig();
 
@@ -41,7 +63,7 @@ public class Ghosts extends JavaPlugin {
         loadRewards();
 
         //Init commands
-        ghostCommand = new CommandGhost("ghost", null);
+        ghostCommand = new CommandGhost(this, "ghost", null);
 
         loadLocations();
 
@@ -49,6 +71,7 @@ public class Ghosts extends JavaPlugin {
 
 
         //Start event timer
+        System.out.println("Loading events");
         timer = new EventTimer(utilities.getEventInterval(), ghostCommand.getLocations(), this);
         timer.runTaskTimer(this, 0L, 20L);
 
@@ -147,5 +170,13 @@ public class Ghosts extends JavaPlugin {
 
         }
 
+    }
+
+    public MongoClient getMongo() {
+        return mongo;
+    }
+
+    public MongoDatabase getMongoDatabase() {
+        return database;
     }
 }

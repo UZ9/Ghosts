@@ -1,10 +1,16 @@
 package com.yerti.ghosts.event;
 
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import com.yerti.ghosts.Ghosts;
 import com.yerti.ghosts.gui.RewardsGUI;
 import com.yerti.ghosts.utils.Utilities;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bson.Document;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -37,14 +43,14 @@ public class EventTimer extends BukkitRunnable implements Listener {
     private static Location location;
     private static UUID entityUUID;
     static int tier;
-    private static Plugin plugin;
+    private static Ghosts plugin;
 
     static boolean eventSpawned = false;
 
     static Utilities utilities;
     public static LivingEntity eventEntity;
 
-    public EventTimer(int delay, Map<String, Location> locations, Plugin plugin) {
+    public EventTimer(int delay, Map<String, Location> locations, Ghosts plugin) {
         EventTimer.delay = delay;
         currentTime = delay;
         EventTimer.locations = locations;
@@ -100,6 +106,10 @@ public class EventTimer extends BukkitRunnable implements Listener {
         }
     }
 
+    private Document getUser(MongoCollection<Document> collection, String uuid) {
+        return collection.find(Filters.eq("uuid", uuid)).limit(1).first();
+    }
+
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
 
@@ -118,6 +128,15 @@ public class EventTimer extends BukkitRunnable implements Listener {
                     Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(Ghosts.class), () -> {
                         player.openInventory(new RewardsGUI().getInventory(tier));
                     }, 20L);
+
+                    MongoCollection<Document> collection = plugin.getMongoDatabase().getCollection("leaderboards");
+
+                    Document user = getUser(collection, player.getUniqueId().toString());
+
+                    int newAmount = user == null ? 1 : user.getInteger("kills") + 1;
+
+                    collection.updateOne(Filters.eq("uuid", player.getUniqueId().toString()), Updates.set("kills", newAmount), new UpdateOptions().upsert(true));
+
                 }
 
             }

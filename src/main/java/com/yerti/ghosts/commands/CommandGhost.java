@@ -1,11 +1,18 @@
 package com.yerti.ghosts.commands;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.yerti.ghosts.Ghosts;
 import com.yerti.ghosts.GhostsAPI;
 import com.yerti.ghosts.core.commands.CustomCommand;
+import com.yerti.ghosts.core.utils.CenterFontUtil;
 import com.yerti.ghosts.event.EventTimer;
 import com.yerti.ghosts.gui.ItemInputInventory;
 import com.yerti.ghosts.utils.Utilities;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
+import org.bson.Document;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -17,15 +24,19 @@ import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 public class CommandGhost extends CustomCommand {
 
-    Utilities utilities;
+    private Ghosts plugin;
+    private Utilities utilities;
     private Map<String, Location> locations = new HashMap<>();
 
-    public CommandGhost(String command, String permission) {
+    public CommandGhost(Ghosts plugin, String command, String permission) {
         super(command, permission);
+        this.plugin = plugin;
         this.utilities = new Utilities();
     }
 
@@ -50,7 +61,8 @@ public class CommandGhost extends CustomCommand {
                     } else if (EventTimer.currentTime >= 60) {
                         player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + new DecimalFormat("#.##").format(EventTimer.currentTime / 60.) + " &7minutes."));
                     } else {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + EventTimer.currentTime + " &7seconds."));;
+                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + EventTimer.currentTime + " &7seconds."));
+                        ;
                     }
                     return true;
                 }
@@ -78,9 +90,40 @@ public class CommandGhost extends CustomCommand {
                         //TODO: Change from static
                         EventTimer.spawnGhost();
 
+                    } else if (args[0].equalsIgnoreCase("top")) {
+
+                        MongoCollection<Document> collection = plugin.getMongoDatabase().getCollection("leaderboards");
+
+                        FindIterable<Document> iterDoc = collection.find().sort(new BasicDBObject("kills", -1)).limit(10);
+
+                        int index = 1;
+                        Iterator<Document> iterator = iterDoc.iterator();
+
+
+                        player.sendMessage(CenterFontUtil.centerString(ChatColor.GRAY + "" + ChatColor.BOLD + "TOP GHOST KILLS"));
+                        String format = "";
+
+                        if (!iterator.hasNext()) {
+                            player.sendMessage(utilities.getPrefix() + ChatColor.RED + " There currently aren't any ghost kills. Come back later!");
+                            return true;
+                        }
+
+                        while (iterator.hasNext()) {
+                            Document document = iterator.next();
+
+                            format += CenterFontUtil.centerString(ChatColor.DARK_GRAY + "" + index + ". " +ChatColor.RED + Bukkit.getOfflinePlayer(UUID.fromString(document.getString("uuid"))).getName() + ChatColor.DARK_GRAY + " \u00BB " + ChatColor.RED + document.getInteger("kills")) + "\n";
+
+                            index++;
+                        }
+
+
+
+
+                        player.sendMessage(format);
+
 
                     } else {
-                        player.sendMessage(utilities.incorrectUsageMessage().replace("[usage]", "/ghost forcespawn|addlocation|removelocation|rewards|listlocations|reload"));
+                        player.sendMessage(utilities.incorrectUsageMessage().replace("[usage]", "/ghost top|forcespawn|addlocation|removelocation|rewards|listlocations|reload"));
                     }
                     return true;
 
@@ -100,6 +143,7 @@ public class CommandGhost extends CustomCommand {
                                 player.sendMessage(utilities.addedLocationMessage(args[1]));
                             }
                             break;
+
                         case "removelocation":
                             if (locations.keySet().contains(args[1])) {
                                 locations.remove(args[1]);
@@ -147,7 +191,8 @@ public class CommandGhost extends CustomCommand {
                 } else if (EventTimer.currentTime >= 60) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + new DecimalFormat("#.##").format(EventTimer.currentTime / 60.) + " &7minutes."));
                 } else {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + EventTimer.currentTime + " &7seconds."));;
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + EventTimer.currentTime + " &7seconds."));
+                    ;
                 }
                 //player.sendMessage(utilities.noPermMessage());
                 return true;
