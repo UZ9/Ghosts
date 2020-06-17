@@ -1,0 +1,141 @@
+####################################
+#    / _ \ |__   ___  ___| |_ ___  #
+#   / /_\/ '_ \ / _ \/ __| __/ __| #
+#  / /_\\| | | | (_) \__ \ |_\__ \ #
+#  \____/|_| |_|\___/|___/\__|___/ #
+####################################
+
+# Created by Yerti for NoneTaken
+
+#    _____ _           _
+#   / ____| |         | |
+#  | |    | |__   __ _| |_
+#  | |    | '_ \ / _` | __|
+#  | |____| | | | (_| | |_
+#   \_____|_| |_|\__,_|\__|
+
+# What do you want the prefix to be for all messages?
+prefix: '&8[&7Ghosts&8]'
+
+mongo:
+  database-name: "ghosts"
+  host: "localhost"
+  port: 27017
+  username:
+  password: ""
+
+# The prefix can be used in all of the messages below by using [prefix]
+# By default I don't have it in any of the messages, but just add [prefix] wherever you need it to be.
+
+# Message for when reloading the config
+reload-success: '&aSuccessfully reloaded the config!'
+
+# Sent when the player doesn't have perms for a commmand
+no-permission: "&cYou don't have permission for that!"
+
+# Sent when a command is issued that is not from a player (console)
+non-player: '&cYou must be a player to use this command!'
+
+# Sent when only using /ghosts (with permission)
+# \n represents a new line
+help-message:
+  - '&7Ghosts Version 1.0'
+  - '&7/ghost &8addlocation '
+  - '&7/ghost &8listlocations '
+  - '&7/ghost &8removelocation '
+  - '&7/ghost &8rewards <tier> '
+  - '&7/ghost &8reload'
+  - '&7/ghost &8forcespawn'
+
+# Unknown Command/Wrong Usage
+# This uses the placeholder [usage] that is replaced by the correct usage
+incorrect-usage: '&cInvalid Arguments! Usage: [usage]'
+
+# Message Success for when using /ghost addlocation <name>
+# [name] as a placeholder
+added-location: '&aSuccessfully added [name] to the locations!'
+
+# Name already exists when using /ghost addlocation <name>
+# Uses [name] as a placeholder
+location-already-exists: '&cLocation [name] already exists!'
+
+# Message Success for when using /ghost removelocation <name>
+# Uses [name] as a placeholder
+removed-location: '&aSuccessfully removed [name] from the locations!'
+
+# Name doesn't exist when using /ghost removelocation <name>
+# Uses [name] as a placeholder
+no-location: '&cThe name [name] does not exist!'
+
+# Format for each location when using /ghost listlocations
+# Uses [name] and [location] as placeholders
+# For instance, the value below would look like
+# Caverns > /2, 58, 2/92
+# for each location.
+list-locations-format: '&8[name] > &7[location]'
+
+# Opening reward gui when using /ghost rewards <tier>
+# Uses [tier] as a placeholder
+rewards-gui-message: '&aOpening the rewards for  tier [tier].'
+
+# Tier too high or too low
+tier-not-found: "This tier doesn't exist!"
+
+# Name of the GUI for the rewards menu
+# Uses [tier] as a placeholder
+rewards-gui-title: '&cGhost Rewards'
+
+# Message for when closing the rewards editor
+closed-rewards-editor: '&aSuccessfully saved the contents for this tier!'
+
+# Message for when the mob dies
+# Uses [tier] as a placeholder
+event-death-message: '&cA ghost tier [tier] was slaughtered.'
+
+#Message for when a mob spawns
+# Uses [tier] and [locationname] as placeholders
+event-mob-spawn: '&8A tier [tier] ghost has spawned at [locationname]!'
+
+#Message for when there are no locations when using /ghost listlocations
+list-no-locations: "&cThere aren't any locations!"
+
+
+
+# _____
+#/ ____|
+#| |  __  __ _ _ __ ___   ___
+#| | |_ |/ _` | '_ ` _ \ / _ \
+#| |__| | (_| | | | | | |  __/
+#\______|\__,_|_| |_| |_|\___|
+
+#Amount of minutes between every event
+event-interval: 5
+
+#Mob Type to spawn
+mob-type: ZOMBIE
+
+#Health for the tiers
+#The values divide the damage done (due to the max health 1024)
+#Rewards are edited in-game, they should not be edited here
+tiers:
+  1:
+    health: 200
+  2:
+    health: 400
+  3:
+    health: 1000
+
+#  _                     _   _
+# | |                   | | (_)
+# | |     ___   ___ __ _| |_ _  ___  _ __  ___
+# | |    / _ \ / __/ _` | __| |/ _ \| '_ \/ __|
+# | |___| (_) | (_| (_| | |_| | (_) | | | \__ \
+# |______\___/ \___\__,_|\__|_|\___/|_| |_|___/
+
+# On the reload/disable of this plugin this will automatically fill in for you.
+locations: ''
+
+
+
+
+

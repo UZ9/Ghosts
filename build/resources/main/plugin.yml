@@ -1,0 +1,5 @@
+name: Ghosts
+version: 1.3
+description: Ghost plugin as requested by NoneTaken
+author: Yerti
+main: com.yerti.ghosts.Ghosts
