@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import systems.amit.spigot.aUUIDFetcher.aUUIDFetcher;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ public class Ghosts extends JavaPlugin {
     private CommandGhost ghostCommand;
     private ItemInputInventory editorInventory;
     private EventTimer timer;
+    private aUUIDFetcher fetcher;
     //private JedisPool pool;
     private MongoClient mongo;
     private MongoDatabase database;
@@ -35,7 +37,7 @@ public class Ghosts extends JavaPlugin {
     @Override
     public void onEnable() {
         this.mongo = new MongoClient(new MongoClientURI("mongodb://127.0.0.1:27017"));
-
+        this.fetcher = new aUUIDFetcher(this);
         /*
         MongoCredential.createCredential(
                 getConfig().getString("mongo.username"),
@@ -178,5 +180,9 @@ public class Ghosts extends JavaPlugin {
 
     public MongoDatabase getMongoDatabase() {
         return database;
+    }
+
+    public aUUIDFetcher getFetcher() {
+        return fetcher;
     }
 }

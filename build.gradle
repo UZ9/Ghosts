@@ -36,6 +36,15 @@ repositories {
         url "https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core"
     }
 
+    maven {
+        credentials {
+            username = "user"
+            password = "snfKEkbK36rvHKWk"
+        }
+        url "https://repo.banditmc.net/repository/banditmc-repo/"
+    }
+
+    jcenter()
     mavenLocal()
     mavenCentral()
 }
@@ -53,6 +62,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core
     compile group: 'org.mongodb', name: 'mongodb-driver-core', version: '3.11.2'
+
+    compileOnly "systems.amit.spigot:aUUIDFetcher:2.0"
 }
 
 jar {

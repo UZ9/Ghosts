@@ -53,19 +53,54 @@ public class CommandGhost extends CustomCommand {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if (player.hasPermission("ghosts.admin") || player.isOp()) {
+            if (args.length == 0) {
+                if (GhostsAPI.getGhostEntity() != null) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &cThere is already a ghost spawned!"));
+                } else if (EventTimer.currentTime >= 60) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + new DecimalFormat("#.##").format(EventTimer.currentTime / 60.) + " &7minutes."));
+                } else {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + EventTimer.currentTime + " &7seconds."));
+                    ;
+                }
+                return true;
+            } else if (args.length == 1) {
 
-                if (args.length == 0) {
-                    if (GhostsAPI.getGhostEntity() != null) {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &cThere is already a ghost spawned!"));
-                    } else if (EventTimer.currentTime >= 60) {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + new DecimalFormat("#.##").format(EventTimer.currentTime / 60.) + " &7minutes."));
-                    } else {
-                        player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + EventTimer.currentTime + " &7seconds."));
-                        ;
+                if (args[0].equalsIgnoreCase("top")) {
+
+                    MongoCollection<Document> collection = plugin.getMongoDatabase().getCollection("leaderboards");
+
+                    FindIterable<Document> iterDoc = collection.find().sort(new BasicDBObject("kills", -1)).limit(10);
+
+                    int index = 1;
+                    Iterator<Document> iterator = iterDoc.iterator();
+
+
+                    player.sendMessage(CenterFontUtil.centerString(ChatColor.GRAY + "" + ChatColor.BOLD + "TOP GHOST KILLS"));
+                    String format = "";
+
+                    if (!iterator.hasNext()) {
+                        player.sendMessage(utilities.getPrefix() + ChatColor.RED + " There currently aren't any ghost kills. Come back later!");
+                        return true;
                     }
+
+                    while (iterator.hasNext()) {
+                        Document document = iterator.next();
+
+                        format += CenterFontUtil.centerString(ChatColor.DARK_GRAY + "" + index + ". " + ChatColor.RED + plugin.getFetcher().fetchNameBlocking(UUID.fromString(document.getString("uuid"))) + ChatColor.DARK_GRAY + " \u00BB " + ChatColor.RED + document.getInteger("kills")) + "\n";
+
+                        index++;
+                    }
+
+
+                    player.sendMessage(format);
                     return true;
                 }
+
+            }
+
+            if (player.hasPermission("ghosts.admin") || player.isOp()) {
+
+
 
                 if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("help")) {
@@ -89,38 +124,6 @@ public class CommandGhost extends CustomCommand {
                     } else if (args[0].equalsIgnoreCase("forcespawn")) {
                         //TODO: Change from static
                         EventTimer.spawnGhost();
-
-                    } else if (args[0].equalsIgnoreCase("top")) {
-
-                        MongoCollection<Document> collection = plugin.getMongoDatabase().getCollection("leaderboards");
-
-                        FindIterable<Document> iterDoc = collection.find().sort(new BasicDBObject("kills", -1)).limit(10);
-
-                        int index = 1;
-                        Iterator<Document> iterator = iterDoc.iterator();
-
-
-                        player.sendMessage(CenterFontUtil.centerString(ChatColor.GRAY + "" + ChatColor.BOLD + "TOP GHOST KILLS"));
-                        String format = "";
-
-                        if (!iterator.hasNext()) {
-                            player.sendMessage(utilities.getPrefix() + ChatColor.RED + " There currently aren't any ghost kills. Come back later!");
-                            return true;
-                        }
-
-                        while (iterator.hasNext()) {
-                            Document document = iterator.next();
-
-                            format += CenterFontUtil.centerString(ChatColor.DARK_GRAY + "" + index + ". " +ChatColor.RED + Bukkit.getOfflinePlayer(UUID.fromString(document.getString("uuid"))).getName() + ChatColor.DARK_GRAY + " \u00BB " + ChatColor.RED + document.getInteger("kills")) + "\n";
-
-                            index++;
-                        }
-
-
-
-
-                        player.sendMessage(format);
-
 
                     } else {
                         player.sendMessage(utilities.incorrectUsageMessage().replace("[usage]", "/ghost top|forcespawn|addlocation|removelocation|rewards|listlocations|reload"));
@@ -185,17 +188,6 @@ public class CommandGhost extends CustomCommand {
                 }
 
 
-            } else {
-                if (GhostsAPI.getGhostEntity() != null) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &cThere is already a ghost spawned!"));
-                } else if (EventTimer.currentTime >= 60) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + new DecimalFormat("#.##").format(EventTimer.currentTime / 60.) + " &7minutes."));
-                } else {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', utilities.getPrefix() + " &7The next ghost will be in &c" + EventTimer.currentTime + " &7seconds."));
-                    ;
-                }
-                //player.sendMessage(utilities.noPermMessage());
-                return true;
             }
 
         } else {

@@ -71,5 +71,20 @@
       <option name="name" value="maven6" />
       <option name="url" value="https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven7" />
+      <option name="name" value="maven7" />
+      <option name="url" value="https://user:snfKEkbK36rvHKWk@repo.banditmc.net/repository/banditmc-repo/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="BintrayJCenter" />
+      <option name="name" value="BintrayJCenter" />
+      <option name="url" value="https://jcenter.bintray.com/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven7" />
+      <option name="name" value="maven7" />
+      <option name="url" value="https://repo.banditmc.net/repository/banditmc-repo/" />
+    </remote-repository>
   </component>
 </project>
