@@ -7,6 +7,7 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.yerti.ghosts.Ghosts;
+import com.yerti.ghosts.api.GhostDeathEvent;
 import com.yerti.ghosts.gui.RewardsGUI;
 import com.yerti.ghosts.utils.Utilities;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
@@ -120,10 +121,13 @@ public class EventTimer extends BukkitRunnable implements Listener {
             event.getDrops().clear();
             Bukkit.broadcastMessage(utilities.eventDeathMessage(tier));
 
+            List<Player> finalPlayers = new ArrayList<>();
+
             for (Map.Entry<Player, Long> entry : attackers.entrySet()) {
                 Player player = entry.getKey();
 
                 if (System.currentTimeMillis() - entry.getValue() < 5000) {//5 seconds
+                    finalPlayers.add(player);
                     if (player.getOpenInventory() != null) player.closeInventory();
                     Bukkit.getScheduler().runTaskLater(JavaPlugin.getProvidingPlugin(Ghosts.class), () -> {
                         player.openInventory(new RewardsGUI().getInventory(tier));
@@ -140,6 +144,8 @@ public class EventTimer extends BukkitRunnable implements Listener {
                 }
 
             }
+
+            plugin.getServer().getPluginManager().callEvent(new GhostDeathEvent(finalPlayers, tier));
 
 
             eventSpawned = false;
